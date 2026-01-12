@@ -2,6 +2,14 @@ import type { Vehicle, VehicleFormData } from '@/types';
 
 const API_BASE = '/api';
 
+// Minimal form data for create/update (only required fields)
+type VehicleFormInput = Partial<VehicleFormData> & {
+  plate: string;
+  regExpiry: string;
+  insExpiry: string;
+  inspExpiry: string;
+};
+
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const error = await response.json().catch(() => ({ message: 'Something went wrong' }));
@@ -51,7 +59,7 @@ export async function getVehicle(id: string): Promise<Vehicle> {
   return handleResponse(response);
 }
 
-export async function createVehicle(data: VehicleFormData): Promise<Vehicle> {
+export async function createVehicle(data: VehicleFormInput): Promise<Vehicle> {
   const response = await fetch(`${API_BASE}/vehicles`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -60,7 +68,7 @@ export async function createVehicle(data: VehicleFormData): Promise<Vehicle> {
   return handleResponse(response);
 }
 
-export async function updateVehicle(id: string, data: VehicleFormData): Promise<Vehicle> {
+export async function updateVehicle(id: string, data: VehicleFormInput): Promise<Vehicle> {
   const response = await fetch(`${API_BASE}/vehicles/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

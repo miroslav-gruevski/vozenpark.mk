@@ -141,13 +141,13 @@ const statusFilterOptions = [
 const yearOptions = Array.from({ length: 30 }, (_, i) => 2026 - i);
 
 // Helper to calculate date offset from now (in days)
-const daysFromNow = (days: number): string => {
-  return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+const daysFromNow = (days: number): Date => {
+  return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
 };
 
 // Function to generate demo vehicles - called client-side only to avoid hydration mismatch
 const generateDemoVehicles = (): Vehicle[] => {
-  const now = new Date().toISOString();
+  const now = new Date();
   return [
   {
     id: '1',
@@ -411,8 +411,8 @@ function transliterate(text: string | undefined, lang: Language): string {
 }
 
 // Format date for input field (YYYY-MM-DD)
-function formatDateForInput(dateStr: string): string {
-  const date = new Date(dateStr);
+function formatDateForInput(dateOrStr: Date | string): string {
+  const date = dateOrStr instanceof Date ? dateOrStr : new Date(dateOrStr);
   return date.toISOString().split('T')[0];
 }
 
@@ -659,7 +659,6 @@ export default function DemoPage() {
     selectFuel: { en: 'Select fuel', mk: 'Избери гориво', sq: 'Zgjidh karburantin', tr: 'Yakıt seç', sr: 'Изабери гориво' },
     noResults: { en: 'No vehicles match your search', mk: 'Нема возила што одговараат на пребарувањето', sq: 'Asnjë automjet nuk përputhet', tr: 'Aramanıza uygun araç yok', sr: 'Нема возила која одговарају претрази' },
     clearFilters: { en: 'Clear Filters', mk: 'Исчисти филтри', sq: 'Pastro filtrat', tr: 'Filtreleri Temizle', sr: 'Очисти филтере' },
-    noVehicles: { en: 'No vehicles yet', mk: 'Сè уште нема возила', sq: 'Ende nuk ka automjete', tr: 'Henüz araç yok', sr: 'Још нема возила' },
     actions: { en: 'Actions', mk: 'Акции', sq: 'Veprimet', tr: 'İşlemler', sr: 'Акције' },
   };
 
@@ -877,12 +876,12 @@ export default function DemoPage() {
       plate: vehicle.plate,
       vin: vehicle.vin || '',
       responsiblePerson: vehicle.responsiblePerson || '',
-      purchaseDate: vehicle.purchaseDate ? formatDateForInput(vehicle.purchaseDate as unknown as string) : '',
+      purchaseDate: vehicle.purchaseDate ? formatDateForInput(vehicle.purchaseDate) : '',
       purchasePrice: vehicle.purchasePrice?.toString() || '',
       mileage: vehicle.mileage?.toString() || '',
-      regExpiry: formatDateForInput(vehicle.regExpiry as unknown as string),
-      insExpiry: formatDateForInput(vehicle.insExpiry as unknown as string),
-      inspExpiry: formatDateForInput(vehicle.inspExpiry as unknown as string),
+      regExpiry: formatDateForInput(vehicle.regExpiry),
+      insExpiry: formatDateForInput(vehicle.insExpiry),
+      inspExpiry: formatDateForInput(vehicle.inspExpiry),
       notes: vehicle.notes || '',
     });
     setShowPurchaseDetails(!!(vehicle.purchaseDate || vehicle.purchasePrice || vehicle.mileage));
@@ -909,13 +908,13 @@ export default function DemoPage() {
       purchaseDate: formData.purchaseDate ? new Date(formData.purchaseDate) : undefined,
       purchasePrice: formData.purchasePrice ? parseFloat(formData.purchasePrice.replace(/,/g, '')) : undefined,
       mileage: formData.mileage ? parseInt(formData.mileage.replace(/,/g, '')) : undefined,
-      regExpiry: new Date(formData.regExpiry).toISOString(),
-      insExpiry: new Date(formData.insExpiry).toISOString(),
-      inspExpiry: new Date(formData.inspExpiry).toISOString(),
+      regExpiry: new Date(formData.regExpiry),
+      insExpiry: new Date(formData.insExpiry),
+      inspExpiry: new Date(formData.inspExpiry),
       notes: formData.notes || undefined,
       userId: 'demo',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     setVehicles([newVehicle, ...vehicles]);
     setAddDialogOpen(false);
@@ -939,11 +938,11 @@ export default function DemoPage() {
             purchaseDate: formData.purchaseDate ? new Date(formData.purchaseDate) : undefined,
             purchasePrice: formData.purchasePrice ? parseFloat(formData.purchasePrice.replace(/,/g, '')) : undefined,
             mileage: formData.mileage ? parseInt(formData.mileage.replace(/,/g, '')) : undefined,
-            regExpiry: new Date(formData.regExpiry).toISOString(),
-            insExpiry: new Date(formData.insExpiry).toISOString(),
-            inspExpiry: new Date(formData.inspExpiry).toISOString(),
+            regExpiry: new Date(formData.regExpiry),
+            insExpiry: new Date(formData.insExpiry),
+            inspExpiry: new Date(formData.inspExpiry),
             notes: formData.notes || undefined,
-            updatedAt: new Date().toISOString(),
+            updatedAt: new Date(),
           }
         : v
     ));
@@ -1071,12 +1070,12 @@ export default function DemoPage() {
               year: values[4] ? parseInt(values[4]) : undefined,
               fuelType: (values[5] as FuelType) || undefined,
               responsiblePerson: values[6] || undefined,
-              regExpiry: values[7] ? new Date(values[7]).toISOString() : new Date().toISOString(),
-              insExpiry: values[8] ? new Date(values[8]).toISOString() : new Date().toISOString(),
-              inspExpiry: values[9] ? new Date(values[9]).toISOString() : new Date().toISOString(),
+              regExpiry: values[7] ? new Date(values[7]) : new Date(),
+              insExpiry: values[8] ? new Date(values[8]) : new Date(),
+              inspExpiry: values[9] ? new Date(values[9]) : new Date(),
               notes: values[10] || undefined,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
+              createdAt: new Date(),
+              updatedAt: new Date(),
             });
           }
         }

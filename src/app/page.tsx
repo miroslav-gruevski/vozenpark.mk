@@ -372,13 +372,16 @@ function DashboardPreview({ language }: { language: LanguageType }) {
               </TableHead>
               <TableBody>
                 {vehicles.map((vehicle, i) => (
-                  <motion.tr
+                  <TableRow
                     key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.6 + i * 0.1 }}
-                    component={TableRow}
-                    sx={{ '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.02) } }}
+                    sx={{ 
+                      '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.02) },
+                      animation: `fadeInRow 0.3s ease-out ${0.6 + i * 0.1}s both`,
+                      '@keyframes fadeInRow': {
+                        from: { opacity: 0, transform: 'translateX(-10px)' },
+                        to: { opacity: 1, transform: 'translateX(0)' }
+                      }
+                    }}
                   >
                     <TableCell sx={{ py: 1.5 }}>
                       <Stack direction="row" alignItems="center" spacing={1}>
@@ -417,7 +420,7 @@ function DashboardPreview({ language }: { language: LanguageType }) {
                     <TableCell sx={{ py: 1.5 }}>
                       <IconButton size="small"><MoreVertOutlined sx={{ fontSize: 16 }} /></IconButton>
                     </TableCell>
-                  </motion.tr>
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>
@@ -622,7 +625,7 @@ export default function HomePage() {
   const currentLang = languages.find(l => l.code === language);
 
   // All page translations
-  const pageText: Record<string, Record<string, string>> = {
+  const pageText: Record<string, Record<string, string | string[]>> = {
     freeTrial: { en: '✨ Free trial available', mk: '✨ Бесплатен пробен период', sq: '✨ Provë falas në dispozicion', tr: '✨ Ücretsiz deneme mevcut', sr: '✨ Бесплатна проба доступна' },
     heroLine1: { en: 'Never miss a', mk: 'Никогаш повеќе не пропуштајте', sq: 'Mos humbisni kurrë një', tr: 'Asla kaçırmayın', sr: 'Никада не пропустите' },
     heroLine2: { en: 'vehicle registration', mk: 'регистрација', sq: 'regjistrim automjeti', tr: 'araç kaydı', sr: 'регистрацију возила' },
@@ -754,12 +757,20 @@ export default function HomePage() {
     allRights: { en: 'All rights reserved.', mk: 'Сите права задржани.', sq: 'Të gjitha të drejtat e rezervuara.', tr: 'Tüm hakları saklıdır.', sr: 'Сва права задржана.' },
   };
 
-  const pt = (key: string) => pageText[key]?.[language] || pageText[key]?.['en'] || key;
+  const pt = (key: string): string => {
+    const val = pageText[key]?.[language] || pageText[key]?.['en'] || key;
+    return Array.isArray(val) ? val.join(', ') : val;
+  };
+
+  const getFeatures = (key: string): string[] => {
+    const val = pageText[key]?.[language] || pageText[key]?.['en'];
+    return Array.isArray(val) ? val : [];
+  };
 
   const processSteps = [
-    { icon: AddOutlined, title: pt('step1Title'), desc: pt('step1Desc'), features: pageText.step1Features?.[language] || pageText.step1Features?.['en'] || [] },
-    { icon: CalendarMonthOutlined, title: pt('step2Title'), desc: pt('step2Desc'), features: pageText.step2Features?.[language] || pageText.step2Features?.['en'] || [] },
-    { icon: EmailOutlined, title: pt('step3Title'), desc: pt('step3Desc'), features: pageText.step3Features?.[language] || pageText.step3Features?.['en'] || [] },
+    { icon: AddOutlined, title: pt('step1Title'), desc: pt('step1Desc'), features: getFeatures('step1Features') },
+    { icon: CalendarMonthOutlined, title: pt('step2Title'), desc: pt('step2Desc'), features: getFeatures('step2Features') },
+    { icon: EmailOutlined, title: pt('step3Title'), desc: pt('step3Desc'), features: getFeatures('step3Features') },
   ];
 
   const features = [
