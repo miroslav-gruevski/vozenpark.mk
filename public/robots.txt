@@ -1,0 +1,12 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow private/auth pages
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /login
+Disallow: /signup
+
+# Sitemap
+Sitemap: https://vozenpark.mk/sitemap.xml
